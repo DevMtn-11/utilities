@@ -264,14 +264,13 @@ var _ = { };
   // should return the previously returned value.
   _.once = function(func) {
     var called = false;
-    function check(called) {
-      if(!called) {
-        called = true;
-        return returnVal;
-      }
-    }
 
-    return check(called);
+    return function() {
+      if(called === false){
+        called = true;
+        return func();
+      }
+    };
   };
 
   // Memoize an expensive function by storing its results. You may assume
@@ -281,6 +280,19 @@ var _ = { };
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
+    var arr = [];
+
+    return function() {
+      for(var i = 0; i < arr.length; i++) {
+        if(arr[i]() === func()) {
+          return arr[i];
+        }
+        else {
+          return func;
+        }
+      }
+      arr.push(func);
+    };
   };
 
   // Delays a function for the given number of milliseconds, and then calls
