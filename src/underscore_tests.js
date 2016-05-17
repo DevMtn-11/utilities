@@ -280,18 +280,13 @@ var _ = { };
   // already computed the result for the given argument and return that value
   // instead if possible.
   _.memoize = function(func) {
-    var arr = [];
+    var storedVals = {};
 
-    return function() {
-      for(var i = 0; i < arr.length; i++) {
-        if(arr[i]() === func()) {
-          return arr[i];
-        }
-        else {
-          return func;
-        }
+    return function(arg) {
+      if(!(storedVals.hasOwnProperty(arg))) {
+        storedVals[arg] = func(arg);
       }
-      arr.push(func);
+      return storedVals[arg];
     };
   };
 
@@ -302,6 +297,7 @@ var _ = { };
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait, a, b) {
+    
   };
 
 
@@ -338,7 +334,6 @@ var _ = { };
       for(var j = 0; j < arguments[i].length; j++) {
         tempArr.push(arguments[i][j]);
       }
-      mainArr.push
     }
   };
 
