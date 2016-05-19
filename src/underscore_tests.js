@@ -297,7 +297,10 @@ var _ = { };
   // parameter. For example _.delay(someFunction, 500, 'a', 'b') will
   // call someFunction('a', 'b') after 500ms
   _.delay = function(func, wait, a, b) {
-    
+    var fn = function(){
+      return func(a,b);
+    };
+    setTimeout(fn, wait);
   };
 
 
@@ -320,6 +323,35 @@ var _ = { };
   // of that string. For example, _.sortBy(people, 'name') should sort
   // an array of people by their name.
   _.sortBy = function(collection, iterator) {
+    if(typeof iterator === 'string') {
+      var swapped;
+      do {
+        swapped = false;
+        for (var i = 0; i < collection.length - 1; i++) {
+          if (collection[i][iterator] > collection[i + 1][iterator]) {
+            var temp = collection[i];
+            collection[i] = collection[i + 1];
+            collection[i + 1] = temp;
+            swapped = true;
+          }
+        }
+      } while (swapped);
+    }
+    else {
+      var swpped;
+      do {
+        swpped = false;
+        for (var j = 0; j < collection.length - 1; j++) {
+          if (iterator(collection[j]) > iterator(collection[j + 1]) || (iterator(collection[j]) === undefined && iterator(collection[j + 1]) !== undefined)) {
+            var tmp = collection[j];
+            collection[j] = collection[j + 1];
+            collection[j + 1] = tmp;
+            swpped = true;
+          }
+        }
+      } while (swpped);
+    }
+    return collection;
   };
 
   // Zip together two or more arrays with elements of the same index
@@ -328,28 +360,113 @@ var _ = { };
   // Example:
   // _.zip(['a','b','c','d'], [1,2,3]) returns [['a',1], ['b',2], ['c',3], ['d',undefined]]
   _.zip = function() {
+    var argLen = arguments.length;
     var mainArr = [];
-    var tempArr = [];
+    var numOfArrays = 0;
     for(var i = 0; i < arguments.length; i++) {
-      for(var j = 0; j < arguments[i].length; j++) {
-        tempArr.push(arguments[i][j]);
+      if(arguments[i].length > numOfArrays) {
+        numOfArrays = arguments[i].length;
       }
     }
+
+    for(i = 0; i < numOfArrays; i++) {
+      mainArr.push([]);
+    }
+
+    for(i = 0; i < argLen; i++) {
+      for(var j = 0; j < numOfArrays; j++) {
+        if(arguments[i][j] !== undefined) {
+          mainArr[j].push(arguments[i][j]);
+        }
+        else{
+          mainArr[j].push(undefined);
+        }
+      }
+    }
+
+    return mainArr;
   };
 
   // Takes a multidimensional array and converts it to a one-dimensional array.
   // The new array should contain all elements of the multidimensional array.
   _.flatten = function(nestedArray, result) {
+    var arr = [];
+
+    function isArr(el) {
+      if(Array.isArray(el)) {
+        el.forEach(function(e) {
+          if(isArr(e)) {
+            arr.push(isArr(e));
+          }
+        });
+      }
+      else {
+        return el;
+      }
+    }
+
+    isArr(nestedArray);
+    return arr;
   };
 
   // Takes an arbitrary number of arrays and produces an array that contains
   // every item shared between all the passed-in arrays.
   _.intersection = function() {
+    var count = {};
+    var arr = [];
+    for(var i = 0; i < arguments.length; i++) {
+      arguments[i].forEach(function(el) {
+        if(!(count.hasOwnProperty(el))) {
+          count[el] = 1;
+        }
+        else {
+          count[el]++;
+        }
+      });
+    }
+    for(var key in count) {
+      if(count[key] < arguments.length) {
+        delete count[key];
+      }
+    }
+    for(var prop in count) {
+      arr.push(prop);
+    }
+    return arr;
   };
 
   // Take the difference between one array and a number of other arrays.
   // Only the elements present in just the first array will remain.
   _.difference = function(array) {
+    var count = {};
+    var arr = [];
+    for(var i = 0; i < array.length; i++) {
+      if(!(count.hasOwnProperty(array[i]))) {
+        count[array[i]] = 1;
+      }
+      else {
+        count[array[i]]++;
+      }
+    }
+
+    for(var j = 1; j < arguments.length; j++) {
+      console.log(arguments[j]);
+      arguments[j].forEach(function(el){
+        if(count.hasOwnProperty(el)) {
+          count[el]++;
+        }
+      });
+    }
+
+    for(var prop in count) {
+      if(count[prop] > 1) {
+        delete count[prop];
+      }
+    }
+    for(var key in count) {
+      arr.push(key);
+    }
+    return arr;
   };
 
 }).call(this);
