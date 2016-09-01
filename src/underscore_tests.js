@@ -16,7 +16,6 @@ var _ = { };
   // Return an array of the first n elements of an array. If n is undefined,
   // return just the first element.
   _.first = function(array, n) {
-    var newArr = [];
     if(n === undefined) {
       return array[0];
     }
@@ -26,28 +25,19 @@ var _ = { };
     else if(n > array.length) {
       return array;
     }
-
-    for(var i = 0; i < n; i++) {
-      newArr.push(array[i]);
-    }
-    return newArr;
+    return array.splice(0, n);
   };
 
   // Like first, but for the last elements. If n is undefined, return just the
   // last element.
   _.last = function(array, n) {
-    var newArr = [];
     if(n === undefined) {
       return array[array.length - 1];
     }
     else if(n > array.length) {
       return array;
     }
-
-    for(var i = array.length - n; i < array.length; i++) {
-      newArr.push(array[i]);
-    }
-    return newArr;
+    return array.splice(array.length - n);
   };
 
   // Call iterator(value, key, collection) for each element of collection.
@@ -80,7 +70,7 @@ var _ = { };
   _.filter = function(collection, iterator) {
     var newArr = [];
     for(var i = 0; i < collection.length; i++) {
-      if(iterator(i) !== true) {
+      if(!iterator(i)) {
         newArr.push(collection[i]);
       }
     }
@@ -91,7 +81,7 @@ var _ = { };
   _.reject = function(collection, iterator) {
     var newArr = [];
     for(var i = 0; i < collection.length; i++) {
-      if(iterator(i) === true) {
+      if(iterator(i)) {
         newArr.push(collection[i]);
       }
     }
@@ -102,7 +92,7 @@ var _ = { };
   _.uniq = function(array) {
     var newArr = [];
     for(var i = 0; i < array.length; i++) {
-      if(_.indexOf(newArr, array[i]) === -1) {
+      if(newArr.indexOf(array[i]) === -1) {
         newArr.push(array[i]);
       }
     }
@@ -118,7 +108,7 @@ var _ = { };
     return array;
   };
 
-  // Takes an array of objects and returns and array of the values of
+  // Takes an array of objects and returns an array of the values of
   // a certain property in it. E.g. take an array of people and return
   // an array of just their ages
   _.pluck = function(array, propertyName) {
